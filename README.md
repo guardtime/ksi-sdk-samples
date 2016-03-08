@@ -12,5 +12,11 @@ Explore the code on Github or clone/download it and use your favorite editor to 
 mvn -Daggregator.url="http://host.net:8080/gt-signingservice" -Dextender.url="http://host.net:8081/gt-extendingservice" -Dksi.login.id=joe -Dksi.login.key=secret test
 ```
 
+Additionally you can override the location of the publications file using 
+```
+-Dpublications.file.url="http://host.net/...."
+```
+The default is Guardtime KSI service publications file http://verify.guardtime.com/ksi-publications.bin
+
 ## License
 See LICENSE file.
