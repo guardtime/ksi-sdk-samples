@@ -16,7 +16,7 @@ import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
  * The samples are implemented as JUnit tests. This is the base class that contains the common parts
  * for all the tests. See  {@see #setUpKsi()} how the KSI context is set up.
  */
-public class KsiSamples {
+public abstract class KsiSamples {
 
     /**
      * The end point URL of the Aggregation service, needed for signing, e.g.
