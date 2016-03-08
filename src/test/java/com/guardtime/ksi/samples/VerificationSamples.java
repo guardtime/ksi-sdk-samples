@@ -23,224 +23,195 @@ import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationB
 
 public class VerificationSamples extends KsiSamples {
 
-	@Before
-	public void setUp() throws KSIException {
-		setUpKsi();
-	}
+    @Before
+    public void setUp() throws KSIException {
+        setUpKsi();
+    }
 
-	@After
-	public void tearDown() {
-		tearDownKsi();
-	}
+    @After
+    public void tearDown() {
+        tearDownKsi();
+    }
 
-	/**
-	 * Using information in the signature, extracts and prints the hash
-	 * algorithm that was used for document hashing during the creation of the
-	 * signature.
-	 */
-	@Test
-	public void extractDocumentHashAlgorithm()
-			throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Using information in the signature, extracts and prints the hash algorithm that was used for
+     * document hashing during the creation of the signature.
+     */
+    @Test
+    public void extractDocumentHashAlgorithm() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		KSISignature signature = ksi
-				.read(getFile("signme.txt.unextended-ksig"));
-		HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
+        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
 
-		System.out.println("extractDocumentHashAlgorithm > " + hashAlgorithm);
-	}
+        System.out.println("extractDocumentHashAlgorithm > " + hashAlgorithm);
+    }
 
-	/**
-	 * Verifies signature against a publication using the publications in the
-	 * publication file. The signature must be extended for the verification to
-	 * succeed.
-	 */
-	@Test
-	public void verifyExtendedSignatureUsingPublicationsFile()
-			throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Verifies signature against a publication using the publications in the publication file. The
+     * signature must be extended for the verification to succeed.
+     */
+    @Test
+    public void verifyExtendedSignatureUsingPublicationsFile() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		// Read the existing signature
-		KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        // Read the existing signature
+        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
-		// We need to compute the hash from the original data, to make sure it
-		// matches the one in the signature and has not been changed
-		// Use the same algorithm as the input hash in the signature
-		DataHasher dataHasher = new DataHasher(
-				signature.getInputHash().getAlgorithm());
-		dataHasher.addData(getFile("signme.txt"));
+        // We need to compute the hash from the original data, to make sure it
+        // matches the one in the signature and has not been changed
+        // Use the same algorithm as the input hash in the signature
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
 
-		// Do the verification and check the result
-		Policy policy = new PublicationsFileBasedVerificationPolicy();
-		VerificationResult verificationResult = ksi.verify(signature, policy,
-				dataHasher.getHash());
+        // Do the verification and check the result
+        Policy policy = new PublicationsFileBasedVerificationPolicy();
+        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
 
-		if (verificationResult.isOk()) {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsFile > signature valid");
-		} else {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsFile > verification failed with error code > "
-							+ verificationResult.getErrorCode());
-		}
-	}
+        if (verificationResult.isOk()) {
+            System.out.println("verifyExtendedSignatureUsingPublicationsFile > signature valid");
+        } else {
+            System.out.println("verifyExtendedSignatureUsingPublicationsFile > verification failed with error code > "
+                    + verificationResult.getErrorCode());
+        }
+    }
 
-	/**
-	 * Verifies the signature against a publication using the specified
-	 * publication string (code).
-	 */
-	@Test
-	public void verifyExtendedSignatureUsingPublicationsCode()
-			throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Verifies the signature against a publication using the specified publication string (code).
+     */
+    @Test
+    public void verifyExtendedSignatureUsingPublicationsCode() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		// Read the existing signature, it is assumed to be extended the
-		// publication below,
-		// in order the verification to succeed
-		KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        // Read the existing signature, it is assumed to be extended the
+        // publication below,
+        // in order the verification to succeed
+        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
-		// We need to compute the hash from the original data, to make sure it
-		// matches the one in the signature and has not been changed
-		// Use the same algorithm as the input hash in the signature
-		DataHasher dataHasher = new DataHasher(
-				signature.getInputHash().getAlgorithm());
-		dataHasher.addData(getFile("signme.txt"));
+        // We need to compute the hash from the original data, to make sure it
+        // matches the one in the signature and has not been changed
+        // Use the same algorithm as the input hash in the signature
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
 
-		// TODO: Extend the signature to March publication and then updated the
-		// code
-		// The trust anchor in this example is the publication code in Financial
-		// Times or on Twitter
-		String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
-		PublicationData publicationData = new PublicationData(pubString);
+        // TODO: Extend the signature to March publication and then updated the
+        // code
+        // The trust anchor in this example is the publication code in Financial
+        // Times or on Twitter
+        String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
+        PublicationData publicationData = new PublicationData(pubString);
 
-		// Do the verification and check the result
-		Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
-		VerificationResult verificationResult = ksi.verify(signature, policy,
-				dataHasher.getHash(), publicationData);
+        // Do the verification and check the result
+        Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
+        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash(), publicationData);
 
-		if (verificationResult.isOk()) {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsCode > signature valid");
-		} else {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsCode > signature verification failed with error code > "
-							+ verificationResult.getErrorCode());
-		}
-	}
+        if (verificationResult.isOk()) {
+            System.out.println("verifyExtendedSignatureUsingPublicationsCode > signature valid");
+        } else {
+            System.out.println(
+                    "verifyExtendedSignatureUsingPublicationsCode > signature verification failed with error code > "
+                            + verificationResult.getErrorCode());
+        }
+    }
 
-	/**
-	 * Verify the given signature against a publication. The signature is not
-	 * extended but auto-extending is enabled and possible (there is a
-	 * publication after signing time) so the verification should succeed.
-	 */
-	@Test
-	public void verifyExtendedSignatureUsingPublicationsCodeAutoExtend()
-			throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Verify the given signature against a publication. The signature is not extended but
+     * auto-extending is enabled and possible (there is a publication after signing time) so the
+     * verification should succeed.
+     */
+    @Test
+    public void verifyExtendedSignatureUsingPublicationsCodeAutoExtend() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		KSISignature signature = ksi
-				.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
-		// We need to compute the hash from the original data, to make sure it
-		// matches the one in the signature and has not been changed
-		// Use the same algorithm as the input hash in the signature
-		DataHasher dataHasher = new DataHasher(
-				signature.getInputHash().getAlgorithm());
-		dataHasher.addData(getFile("signme.txt"));
+        // We need to compute the hash from the original data, to make sure it
+        // matches the one in the signature and has not been changed
+        // Use the same algorithm as the input hash in the signature
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
 
-		// TODO: Update the code so that extending is possible for the given
-		// signature
-		String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
-		PublicationData publicationData = new PublicationData(pubString);
+        // TODO: Update the code so that extending is possible for the given
+        // signature
+        String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
+        PublicationData publicationData = new PublicationData(pubString);
 
-		// Do the verification and check the result
-		Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
+        // Do the verification and check the result
+        Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
 
-		VerificationContext context = new VerificationContextBuilder()
-				.setDocumentHash(dataHasher.getHash()).setExtendingAllowed(true)
-				.setExtenderClient(getSimpleHttpClient())
-				.setSignature(signature).setUserPublication(publicationData)
-				.setPublicationsFile(ksi.getPublicationsFile())
-				.createVerificationContext();
+        VerificationContext context = new VerificationContextBuilder().setDocumentHash(dataHasher.getHash())
+                .setExtendingAllowed(true).setExtenderClient(getSimpleHttpClient()).setSignature(signature)
+                .setUserPublication(publicationData).setPublicationsFile(ksi.getPublicationsFile())
+                .createVerificationContext();
 
-		VerificationResult verificationResult = ksi.verify(context, policy);
+        VerificationResult verificationResult = ksi.verify(context, policy);
 
-		if (verificationResult.isOk()) {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsCodeAutoExtend > signature valid");
-		} else {
-			System.out.println(
-					"verifyExtendedSignatureUsingPublicationsCodeAutoExtend > signature verification failed with error code > "
-							+ verificationResult.getErrorCode());
-		}
-	}
+        if (verificationResult.isOk()) {
+            System.out.println("verifyExtendedSignatureUsingPublicationsCodeAutoExtend > signature valid");
+        } else {
+            System.out.println(
+                    "verifyExtendedSignatureUsingPublicationsCodeAutoExtend > signature verification failed with error code > "
+                            + verificationResult.getErrorCode());
+        }
+    }
 
-	/**
-	 * Verifies signature using key-based verification policy.
-	 */
-	@Test
-	public void verifyKeyBased() throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Verifies signature using key-based verification policy.
+     */
+    @Test
+    public void verifyKeyBased() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		// Read the existing signature, it is assumed to be extended the
-		// publication below,
-		// in order the verification to succeed
-		KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        // Read the existing signature, it is assumed to be extended the
+        // publication below,
+        // in order the verification to succeed
+        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
-		// We need to compute the hash from the original data, to make sure it
-		// matches the one in the signature and has not been changed
-		// Use the same algorithm as the input hash in the signature
-		DataHasher dataHasher = new DataHasher(
-				signature.getInputHash().getAlgorithm());
-		dataHasher.addData(getFile("signme.txt"));
+        // We need to compute the hash from the original data, to make sure it
+        // matches the one in the signature and has not been changed
+        // Use the same algorithm as the input hash in the signature
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
 
-		// Do the verification and check the result
-		Policy policy = new KeyBasedVerificationPolicy();
-		VerificationResult verificationResult = ksi.verify(signature, policy,
-				dataHasher.getHash());
+        // Do the verification and check the result
+        Policy policy = new KeyBasedVerificationPolicy();
+        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
 
-		if (verificationResult.isOk()) {
-			System.out.println("verifyKeyBased > signature valid");
-		} else {
-			System.out.println(
-					"verifyKeyBased > signature verification failed with error code > "
-							+ verificationResult.getErrorCode());
-		}
-	}
+        if (verificationResult.isOk()) {
+            System.out.println("verifyKeyBased > signature valid");
+        } else {
+            System.out.println("verifyKeyBased > signature verification failed with error code > "
+                    + verificationResult.getErrorCode());
+        }
+    }
 
-	/**
-	 * Verifies signature using calendar-based verification policy.
-	 */
-	@Test
-	public void verifyCalendarBasedUnextended()
-			throws IOException, KSIException {
-		KSI ksi = getKsi();
+    /**
+     * Verifies signature using calendar-based verification policy.
+     */
+    @Test
+    public void verifyCalendarBasedUnextended() throws IOException, KSIException {
+        KSI ksi = getKsi();
 
-		// Read the existing signature, it is assumed to be extended the
-		// publication below,
-		// in order the verification to succeed
-		KSISignature signature = ksi
-				.read(getFile("signme.txt.unextended-ksig"));
+        // Read the existing signature, it is assumed to be extended the
+        // publication below,
+        // in order the verification to succeed
+        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
-		// We need to compute the hash from the original data, to make sure it
-		// matches the one in the signature and has not been changed
-		// Use the same algorithm as the input hash in the signature
-		DataHasher dataHasher = new DataHasher(
-				signature.getInputHash().getAlgorithm());
-		dataHasher.addData(getFile("signme.txt"));
+        // We need to compute the hash from the original data, to make sure it
+        // matches the one in the signature and has not been changed
+        // Use the same algorithm as the input hash in the signature
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
 
-		// Do the verification and check the result
-		Policy policy = new CalendarBasedVerificationPolicy();
-		VerificationResult verificationResult = ksi.verify(signature, policy,
-				dataHasher.getHash());
+        // Do the verification and check the result
+        Policy policy = new CalendarBasedVerificationPolicy();
+        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
 
-		if (verificationResult.isOk()) {
-			System.out
-					.println("verifyCalendarBasedUnextended > signature valid");
-		} else {
-			System.out.println(
-					"verifyCalendarBasedUnextended > signature verification failed with error code > "
-							+ verificationResult.getErrorCode());
-		}
-	}
+        if (verificationResult.isOk()) {
+            System.out.println("verifyCalendarBasedUnextended > signature valid");
+        } else {
+            System.out.println("verifyCalendarBasedUnextended > signature verification failed with error code > "
+                    + verificationResult.getErrorCode());
+        }
+    }
 }
