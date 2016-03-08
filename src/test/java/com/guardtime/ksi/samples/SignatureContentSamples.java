@@ -48,12 +48,12 @@ public class SignatureContentSamples extends KsiSamples {
      * Prints information found in the given signature's aggregation hash chain.
      */
     @Test
-    public void printAhc() throws IOException, KSIException {
+    public void printAggregationHashChain() throws IOException, KSIException {
         KSI ksi = getKsi();
         KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
         for (AggregationHashChain ahc : signature.getAggregationHashChains()) {
-            System.out.println("printAhc > link count > " + ahc.getChainLinks().size());
+            System.out.println("printAggregationHashChain > link count > " + ahc.getChainLinks().size());
         }
     }
 
@@ -61,14 +61,14 @@ public class SignatureContentSamples extends KsiSamples {
      * Prints information found in the given signature's calendar hash chain.
      */
     @Test
-    public void printChc() throws IOException, KSIException {
+    public void printCalendarHashChain() throws IOException, KSIException {
         KSI ksi = getKsi();
 
         KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
         CalendarHashChain chc = signature.getCalendarHashChain();
-        System.out.println("printChc > publication time > " + chc.getPublicationTime());
-        System.out.println("printChc > registration time > " + chc.getRegistrationTime());
+        System.out.println("printCalendarHashChain > publication time > " + chc.getPublicationTime());
+        System.out.println("printCalendarHashChain > registration time > " + chc.getRegistrationTime());
 
     }
 
