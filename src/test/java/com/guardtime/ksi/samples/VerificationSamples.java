@@ -9,7 +9,6 @@ import org.junit.Test;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHasher;
-import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationContext;
@@ -34,20 +33,6 @@ public class VerificationSamples extends KsiSamples {
     }
 
     /**
-     * Using information in the signature, extracts and prints the hash algorithm that was used for
-     * document hashing during the creation of the signature.
-     */
-    @Test
-    public void extractDocumentHashAlgorithm() throws IOException, KSIException {
-        KSI ksi = getKsi();
-
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
-        HashAlgorithm hashAlgorithm = signature.getInputHash().getAlgorithm();
-
-        System.out.println("extractDocumentHashAlgorithm > " + hashAlgorithm);
-    }
-
-    /**
      * Verifies signature against a publication using the publications in the publication file. The
      * signature must be extended for the verification to succeed.
      */
@@ -55,7 +40,7 @@ public class VerificationSamples extends KsiSamples {
     public void verifyExtendedSignatureUsingPublicationsFile() throws IOException, KSIException {
         KSI ksi = getKsi();
 
-        // Read the existing signature
+        // Read the existing signature, assume it is extended
         KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
         // We need to compute the hash from the original data, to make sure it
@@ -83,14 +68,8 @@ public class VerificationSamples extends KsiSamples {
     public void verifyExtendedSignatureUsingPublicationsCode() throws IOException, KSIException {
         KSI ksi = getKsi();
 
-        // Read the existing signature, it is assumed to be extended the
-        // publication below,
-        // in order the verification to succeed
         KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
 
-        // We need to compute the hash from the original data, to make sure it
-        // matches the one in the signature and has not been changed
-        // Use the same algorithm as the input hash in the signature
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
@@ -123,11 +102,9 @@ public class VerificationSamples extends KsiSamples {
     public void verifyExtendedSignatureUsingPublicationsCodeAutoExtend() throws IOException, KSIException {
         KSI ksi = getKsi();
 
+        // Read signature, assume to be not extended
         KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
-        // We need to compute the hash from the original data, to make sure it
-        // matches the one in the signature and has not been changed
-        // Use the same algorithm as the input hash in the signature
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
@@ -162,18 +139,11 @@ public class VerificationSamples extends KsiSamples {
     public void verifyKeyBased() throws IOException, KSIException {
         KSI ksi = getKsi();
 
-        // Read the existing signature, it is assumed to be extended the
-        // publication below,
-        // in order the verification to succeed
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
-        // We need to compute the hash from the original data, to make sure it
-        // matches the one in the signature and has not been changed
-        // Use the same algorithm as the input hash in the signature
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        // Do the verification and check the result
         Policy policy = new KeyBasedVerificationPolicy();
         VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
 
@@ -192,18 +162,11 @@ public class VerificationSamples extends KsiSamples {
     public void verifyCalendarBasedUnextended() throws IOException, KSIException {
         KSI ksi = getKsi();
 
-        // Read the existing signature, it is assumed to be extended the
-        // publication below,
-        // in order the verification to succeed
         KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
-        // We need to compute the hash from the original data, to make sure it
-        // matches the one in the signature and has not been changed
-        // Use the same algorithm as the input hash in the signature
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        // Do the verification and check the result
         Policy policy = new CalendarBasedVerificationPolicy();
         VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
 
