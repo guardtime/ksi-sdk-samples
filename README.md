@@ -3,7 +3,7 @@ Guardtime Keyless Signature Infrastructure (KSI) is an industrial scale blockcha
 
 This repository contains samples on how to use the KSI Java SDK for signing, signature extension and verification.
 ## Usage
-Explore the code on Github or clone/download it and use your favorite editor to understand how to use the Java KSI SDK. In order to run the examples and test KSI:
+Explore the code on Github or clone/download it and use your favorite editor to understand how to use the Java KSI SDK. The samples are implemented as JUnit tests and can be found in the src/test folder. In order to run the examples and test KSI:
  - Download / clone the repository
  - If you are not a KSI user, request for a trial account here https://guardtime.com/blockchain-developers
  - Run tests using Maven, providing the correct Aggregator and Extender service end point URLs and access credentials
