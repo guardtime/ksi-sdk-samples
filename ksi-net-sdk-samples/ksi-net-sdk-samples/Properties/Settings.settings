@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Guardtime.Ksi.Samples.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="HttpSigningServiceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://ksigw.test.guardtime.com:3333/gt-signingservice</Value>
+    </Setting>
+    <Setting Name="HttpSigningServiceUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">anon</Value>
+    </Setting>
+    <Setting Name="HttpSigningServicePass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">anon</Value>
+    </Setting>
+    <Setting Name="HttpExtendingServiceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://ksigw.test.guardtime.com:8010/gt-extendingservice</Value>
+    </Setting>
+    <Setting Name="HttpExtendingServiceUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">anon</Value>
+    </Setting>
+    <Setting Name="HttpExtendingServicePass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">anon</Value>
+    </Setting>
+    <Setting Name="HttpPublicationsFileUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://verify.guardtime.com/ksi-publications.bin</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
