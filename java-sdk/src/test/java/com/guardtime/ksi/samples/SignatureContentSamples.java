@@ -116,7 +116,7 @@ public class SignatureContentSamples extends KsiSamples {
     public void printCalendarAuthenticationRecord() throws IOException, KSIException {
         KSI ksi = getKsi();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
         CalendarAuthenticationRecord car = signature.getCalendarAuthenticationRecord();
         PublicationData publicationData = car.getPublicationData();
