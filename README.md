@@ -26,7 +26,7 @@ The samples are implemented as Unit tests.
 In order to run the examples and test KSI:
  - Download / clone the repository
  - Open .NET SDK samples solution located in folder named 'net-sdk'.
- - Set the correct URLs and access credentials in app.config. 
+ - Set the correct URLs and access credentials in app.config.  
    Application setting keys:
   - Aggregator service end point URL: HttpSigningServiceUrl
   - Aggregator service access credentials: HttpSigningServiceUser:HttpSigningServicePass
