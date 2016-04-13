@@ -21,18 +21,15 @@ Additionally you can override the location of the publications file using
 The default is Guardtime KSI service publications file http://verify.guardtime.com/ksi-publications.bin
 
 ### .NET SDK
-The samples are implemented as Unit tests. 
-
-In order to run the examples and test KSI:
+The samples are implemented as Unit tests. In order to run the examples and test KSI:
  - Download / clone the repository
  - Open .NET SDK samples solution located in folder named 'net-sdk'.
- - Set the correct URLs and access credentials in app.config.  
-   Application setting keys:
-  - Aggregator service end point URL: HttpSigningServiceUrl
-  - Aggregator service access credentials: HttpSigningServiceUser:HttpSigningServicePass
-  - Extender service end point URL: HttpExtendingServiceUrl
-  - Extender service access credentials: HttpExtendingServiceUser:HttpExtendingServicePass
-  - Publications file location: HttpPublicationsFileUrl
+ - Set the correct URLs and access credentials in app.config. Application setting keys:
+   - Aggregator service end point URL: HttpSigningServiceUrl
+   - Aggregator service access credentials: HttpSigningServiceUser:HttpSigningServicePass
+   - Extender service end point URL: HttpExtendingServiceUrl
+   - Extender service access credentials: HttpExtendingServiceUser:HttpExtendingServicePass
+   - Publications file location: HttpPublicationsFileUrl
  - Execute Unit tests.
  
 ## License
