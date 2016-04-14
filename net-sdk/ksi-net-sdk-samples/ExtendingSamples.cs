@@ -32,7 +32,7 @@ namespace Guardtime.Ksi.Samples
         /// Extends signature to the closes publication according to signing time.
         /// </summary>
         [TestMethod]
-        public void ExtendToClosesPublication()
+        public void ExtendToClosestPublication()
         {
             KSI.Ksi ksi = GetKsi();
 
@@ -47,18 +47,18 @@ namespace Guardtime.Ksi.Samples
             // Double check if signature was extended
             if (extendedSignature.IsExtended)
             {
-                Console.WriteLine("ExtendToClosesPublication > extended to publication > " +
+                Console.WriteLine("ExtendToClosestPublication > extended to publication > " +
                                   Util.ConvertUnixTimeToDateTime(extendedSignature.PublicationRecord.PublicationData.PublicationTime));
             }
             else
             {
-                Console.WriteLine("ExtendToClosesPublication > signature not extended");
+                Console.WriteLine("ExtendToClosestPublication > signature not extended");
             }
 
             // Store the extended signature
             //using (FileStream stream = File.Create("sample-file-for-signing.txt.extended.ksig"))
             //{
-            //    signature.WriteTo(stream);
+            //    extendedSignature.WriteTo(stream);
             //}
         }
 

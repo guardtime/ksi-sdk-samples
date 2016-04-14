@@ -105,7 +105,7 @@ public class ExtendingSamples extends KsiSamples {
      * Extends signature to the closes publication according to signing time.
      */
     @Test
-    public void extendToClosesPublication() throws IOException, KSIException {
+    public void extendToClosestPublication() throws IOException, KSIException {
         KSI ksi = getKsi();
 
         // Read an existing signature from file, assume it to be not extended
