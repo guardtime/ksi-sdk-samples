@@ -87,11 +87,9 @@ public class VerificationSamples extends KsiSamples {
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        // TODO: Extend the signature to March publication and then updated the
-        // code
         // The trust anchor in this example is the publication code in Financial
         // Times or on Twitter
-        String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
+        String pubString = "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
@@ -122,9 +120,7 @@ public class VerificationSamples extends KsiSamples {
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        // TODO: Update the code so that extending is possible for the given
-        // signature
-        String pubString = "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM";
+        String pubString = "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
