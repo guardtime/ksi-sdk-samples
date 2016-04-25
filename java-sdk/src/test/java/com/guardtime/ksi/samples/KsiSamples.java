@@ -15,6 +15,7 @@
 package com.guardtime.ksi.samples;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.CertSelector;
 
 import com.guardtime.ksi.KSI;
@@ -121,8 +122,14 @@ public abstract class KsiSamples {
      * Close KSI after the tests have been finished. Called from sub-classes.
      */
     protected void tearDownKsi() {
-        if (ksi != null)
+        if (ksi == null)
+            return;
+
+        try {
             ksi.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
