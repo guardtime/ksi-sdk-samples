@@ -137,7 +137,8 @@ public class ExtendingSamples extends KsiSamples {
         KSI ksi = getKsi();
 
         KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
-        Date publicationDate = new SimpleDateFormat("YYYY-MM-dd").parse("2016-02-01");
+        Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-03-01");
+
         PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
 
         System.out.println("extendToGivenPublicationDate > trying to extend signature to publication > "
@@ -164,8 +165,9 @@ public class ExtendingSamples extends KsiSamples {
         KSI ksi = getKsi();
         KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
 
+        // Publication code for 15.03.2016
         Date publicationDate = new PublicationData(
-                "AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC" + "-3ZGSBM")
+                "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V")
                         .getPublicationTime();
 
         PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
