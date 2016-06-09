@@ -25,7 +25,16 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://ksigw.test.guardtime.com:3333/gt-signingservice")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://verify.guardtime.com/ksi-publications.bin")]
+        public string HttpPublicationsFileUrl {
+            get {
+                return ((string)(this["HttpPublicationsFileUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://signing.service.url")]
         public string HttpSigningServiceUrl {
             get {
                 return ((string)(this["HttpSigningServiceUrl"]));
@@ -34,7 +43,7 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("anon")]
+        [global::System.Configuration.DefaultSettingValueAttribute("user")]
         public string HttpSigningServiceUser {
             get {
                 return ((string)(this["HttpSigningServiceUser"]));
@@ -43,7 +52,7 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("anon")]
+        [global::System.Configuration.DefaultSettingValueAttribute("pass")]
         public string HttpSigningServicePass {
             get {
                 return ((string)(this["HttpSigningServicePass"]));
@@ -52,7 +61,7 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://ksigw.test.guardtime.com:8010/gt-extendingservice")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://extending.service.url")]
         public string HttpExtendingServiceUrl {
             get {
                 return ((string)(this["HttpExtendingServiceUrl"]));
@@ -61,7 +70,7 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("anon")]
+        [global::System.Configuration.DefaultSettingValueAttribute("user")]
         public string HttpExtendingServiceUser {
             get {
                 return ((string)(this["HttpExtendingServiceUser"]));
@@ -70,19 +79,10 @@ namespace Guardtime.Ksi.Samples.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("anon")]
+        [global::System.Configuration.DefaultSettingValueAttribute("pass")]
         public string HttpExtendingServicePass {
             get {
                 return ((string)(this["HttpExtendingServicePass"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://verify.guardtime.com/ksi-publications.bin")]
-        public string HttpPublicationsFileUrl {
-            get {
-                return ((string)(this["HttpPublicationsFileUrl"]));
             }
         }
     }
