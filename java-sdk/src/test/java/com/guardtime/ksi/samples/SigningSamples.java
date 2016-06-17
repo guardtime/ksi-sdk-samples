@@ -33,6 +33,7 @@ import com.guardtime.ksi.blocksigner.KsiBlockSigner;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
+import com.guardtime.ksi.unisignature.IdentityMetadata;
 import com.guardtime.ksi.unisignature.KSISignature;
 
 public class SigningSamples extends KsiSamples {
@@ -123,7 +124,7 @@ public class SigningSamples extends KsiSamples {
 
         int itemCount = 50;
 
-        // Add the items to the block signer
+        // Add the items that need to be signed to the block signer
         DataHasher dh = new DataHasher(HashAlgorithm.SHA2_256);
         for (int i = 1; i <= itemCount; i++) {
             dh.reset();
@@ -140,4 +141,41 @@ public class SigningSamples extends KsiSamples {
         // Store the signatures as needed
         // ...
     }
+
+    /**
+     * Besides performance optimization, client side aggregation can be also used by embedding
+     * metadata. This can be used, for instance, for linking the user identity authenticated by 3rd
+     * party provider (in the same way as KSI GW does for its users). Although, the metadata fields
+     * are fixed and named after how KSI infrastructure uses them, its up to the use case what is
+     * the content and interpretation of metadata to be embedded, KSI signature just ensures its
+     * integrity.
+     * 
+     */
+    @Test
+    public void linkUserIdToSignature() throws KSIException {
+        KsiBlockSigner ksiBlockSigner = new KsiBlockSigner(getSimpleHttpClient());
+        DataHasher dh = new DataHasher(HashAlgorithm.SHA2_256);
+
+        // This is the data we are signing
+        String data = "data";
+        dh.addData(data.getBytes());
+
+        // Suppose that this is the user that initiated the signing
+        // and it has been verified using a 3rd party authentication provider (e.g. LDAP)
+        String userId = "john.smith";
+
+        // Add both, the data and the user to the block signer
+        ksiBlockSigner.add(dh.getHash(), new IdentityMetadata(userId));
+        List<KSISignature> signatures = ksiBlockSigner.sign();
+
+        // We should get only one signature as we only had one item that we signed
+        assertEquals(1, signatures.size());
+
+        // Print the identity to show john.smith is there
+        System.out.println(signatures.get(0).getIdentity());
+
+        // Store the signature as needed
+        // ...
+    }
+
 }
