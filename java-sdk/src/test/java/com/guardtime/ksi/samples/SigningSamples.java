@@ -14,18 +14,22 @@
  */
 package com.guardtime.ksi.samples;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.blocksigner.KsiBlockSigner;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
@@ -107,6 +111,33 @@ public class SigningSamples extends KsiSamples {
         // signature.writeTo(...);
     }
 
+    /**
+     * Signs numbers 1 - 50 (as text) using client side aggregation (block signer). The Merkle tree
+     * is built locally and only a single request is sent to KSI Gateway. For each item individual
+     * KSI signature is returned. This helps achieving a great performance when a huge number of
+     * files are needed to be signed without overloading the KSI GW.
+     */
+    @Test
+    public void signMultipleItemsWithLocalAggregation() throws KSIException {
+        KsiBlockSigner ksiBlockSigner = new KsiBlockSigner(getSimpleHttpClient());
 
+        int itemCount = 50;
 
+        // Add the items to the block signer
+        DataHasher dh = new DataHasher(HashAlgorithm.SHA2_256);
+        for (int i = 1; i <= itemCount; i++) {
+            dh.reset();
+            dh.addData(String.valueOf(i).getBytes());
+            ksiBlockSigner.add(dh.getHash());
+        }
+
+        // Submit the signing request
+        List<KSISignature> signatures = ksiBlockSigner.sign();
+
+        // Just to illustrate that there are as many signatures as items
+        assertEquals(itemCount, signatures.size());
+
+        // Store the signatures as needed
+        // ...
+    }
 }
