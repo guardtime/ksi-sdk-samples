@@ -15,6 +15,7 @@
 package com.guardtime.ksi.samples;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,10 +32,13 @@ import org.junit.Test;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.blocksigner.KsiBlockSigner;
 import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.DataHasher;
 import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.IdentityMetadata;
 import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 public class SigningSamples extends KsiSamples {
 
@@ -176,6 +180,44 @@ public class SigningSamples extends KsiSamples {
 
         // Store the signature as needed
         // ...
+    }
+
+    /**
+     * Normally, the hash provided by the user is assumed to be at the level 0 in
+     * the global aggregation tree. In an advanced scenario someone may build
+     * a Merkle tree externally and provide the root hash for signing to KSI SDK. If then
+     * it is needed later to "augment" the received signature with the hash chain of the externally
+     * built Merkle tree to get a KSI signature to the leaf of that tree,
+     * the level of the root hash has to be correctly provided at signing time.
+     */
+    @Test
+    public void setHashLevel() throws KSIException {
+        KsiBlockSigner ksiBlockSigner = new KsiBlockSigner(getSimpleHttpClient());
+        KSI ksi = getKsi();
+        
+        // Assume that this is the root of the externally built Merkle tree and the level of the root is 5
+        DataHash rootHash = new DataHash(HashAlgorithm.SHA2_256, new byte[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31});
+        
+        // Sign the root hash, but also specify the level (5) so that later
+        // one can augment the received KSI signature with the hash chains of externally
+        // built Merkle tree to get KSI signature down to the leaf of that external tree
+        ksiBlockSigner.add(rootHash, 5, new IdentityMetadata("randomClientId"));
+        List<KSISignature> signatures = ksiBlockSigner.sign();
+
+        // We should get only one signature as we only had one item that we signed
+        assertEquals(1, signatures.size());        
+        KSISignature sig = signatures.get(0);
+        
+        // The received signature verifies fine without specifying the  
+        // level of the hash because the level of the first hash is still 0
+        // and the level correction of first link was set to 5 (so the next computed hash
+        // is expected to be at level 5 + 1 instead of 0 + 1).
+        
+        Policy p = new KeyBasedVerificationPolicy();
+        assertTrue(ksi.verify(sig, p, rootHash).isOk());
+
+        // In order to augment this signature with an aggregation hash chain,
+        // that was below the provided root, the level correction has to be removed (set to 0).
     }
 
 }

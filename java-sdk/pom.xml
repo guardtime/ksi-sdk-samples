@@ -16,17 +16,17 @@
 		<dependency>
 			<groupId>com.guardtime</groupId>
 			<artifactId>ksi-api</artifactId>
-			<version>4.3.55</version>
+			<version>4.5.72</version>
 		</dependency>
 		<dependency>
 			<groupId>com.guardtime</groupId>
 			<artifactId>ksi-service-client-simple-http</artifactId>
-			<version>4.3.55</version>
+			<version>4.5.72</version>
 		</dependency>
 		<dependency>
 			<groupId>com.guardtime</groupId>
 			<artifactId>ksi-blocksigner</artifactId>
-			<version>4.3.55</version>
+			<version>4.5.72</version>
 		</dependency>
 	</dependencies>
 	<build>
