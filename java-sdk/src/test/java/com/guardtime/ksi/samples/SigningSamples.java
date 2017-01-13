@@ -15,6 +15,7 @@
 package com.guardtime.ksi.samples;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -142,8 +143,25 @@ public class SigningSamples extends KsiSamples {
         // Just to illustrate that there are as many signatures as items
         assertEquals(itemCount, signatures.size());
 
-        // Store the signatures as needed
-        // ...
+        // Store the signatures as needed. Note that the signatures
+        // in the list are not in the same order as the hashes were added
+        // to the block signer. One simple option to find the right signature is by
+        // the input hash in the signature. It assumes that all the hashes added
+        // were unique which is currently the case.
+        
+        // In this example we find the hash for the item 15
+        dh.reset();
+        dh.addData(String.valueOf(15).getBytes());
+        DataHash h = dh.getHash();
+
+        KSISignature s15 = null;
+        for (KSISignature s : signatures) {
+        	if (s.getInputHash().equals(h)){
+        		s15 = s;
+        	}
+        }
+
+        assertNotNull(s15);
     }
 
     /**
