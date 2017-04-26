@@ -36,12 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ksi-net-api, Version=3.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ksi-net-sdk.3.3.2\lib\net20\ksi-net-api.dll</HintPath>
+    <Reference Include="ksi-net-api, Version=3.8.308.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ksi-net-sdk.3.8.308.0\lib\net20\ksi-net-api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ksi-net-api-crypto-microsoft, Version=3.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ksi-net-sdk-microsoft-crypto.3.3.2\lib\net20\ksi-net-api-crypto-microsoft.dll</HintPath>
+    <Reference Include="ksi-net-api-crypto-microsoft, Version=3.8.308.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ksi-net-sdk-microsoft-crypto.3.8.308.0\lib\net20\ksi-net-api-crypto-microsoft.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
