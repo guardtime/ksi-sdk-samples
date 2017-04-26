@@ -33,12 +33,12 @@ The samples are implemented as Unit tests. In order to run the examples and test
  - Execute Unit tests.
 
 ### C SDK
-The samples are located in the libksi root directory at src/example.
-  - Download / clone the libksi repository.
+The samples are located in the [libksi](https://github.com/GuardTime/libksi) repository at src/example.
+  - Download / clone the [libksi](https://github.com/GuardTime/libksi) repository
   - Run "autoreconf -iv"
   - Run "./configure"
-  - Run "make test" for the automated tests.
-  - Run "make check" for  the example programs if you skipped the previous step.
+  - Run "make test" for the automated tests
+  - Run "make check" for  the example programs if you skipped the previous step
 
 ## License
 See LICENSE file.
