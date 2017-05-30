@@ -14,8 +14,16 @@
  */
 package com.guardtime.ksi.samples;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.guardtime.ksi.publication.PublicationsFile;
+import com.guardtime.ksi.publication.PublicationsFileFactory;
+import com.guardtime.ksi.publication.inmemory.InMemoryPublicationsFileFactory;
+import com.guardtime.ksi.trust.JKSTrustStore;
+import com.guardtime.ksi.trust.PKITrustStore;
+import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -186,5 +194,65 @@ public class VerificationSamples extends KsiSamples {
             System.out.println("verifyCalendarBasedUnextended > signature verification failed with error code > "
                     + verificationResult.getErrorCode());
         }
+    }
+
+    /**
+     * Demonstrates a) how to fetch publications file from a custom input stream (e.g. a local file) instead of the
+     * default download from a given URL and b) how to use custom trust store to verify the publications file content.
+     * <p>
+     * Note that this is just demonstration of how to accomplish the specific tasks with the KSI SDK, whether such non-default
+     * behaviour makes sense and is needed for an integration, shall be analysed and justified case by case.
+     */
+    @Test
+    public void verifyUsingCustomPublicationsFileAndTrustStore() throws IOException, KSIException {
+        // The two following sections are the important parts of this sample. First the custom trust store is
+        // obtained and then it is used to verify a publications file from custom input stream.
+
+        // If you want to use a custom trust store to verify publications file content, this is the way to do it.
+        // However, in practice, consider that you manually then have to keep it up to date in case any of the CA root certificates
+        // are changed. In the current example we're still using the JVM default trust store file.
+        // Replace the getDefaultTrustStorePath() with the path of the trust store file you want to use.
+        PKITrustStore trustStore = new JKSTrustStore(getDefaultTrustStorePath(), new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"));
+
+        // The next step is to read in the publications file from a custom input stream and use
+        // the custom trust store from above for its verification. In the current case we read the publications file from local file system.
+        PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
+        PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-30.05.2017.bin")));
+
+        // Now the "usual" verification of the KSI signature follows where
+        // the custom publications file from is used in the verification context.
+        KSI ksi = getKsi();
+
+        // Read the existing signature, assume it is extended
+        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+
+        // As usual, hash the data to be verified
+        DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
+        dataHasher.addData(getFile("signme.txt"));
+
+        // Establish the verification policy and context
+        Policy policy = new PublicationsFileBasedVerificationPolicy();
+        VerificationContextBuilder verificationContextBuilder =
+                new VerificationContextBuilder().setDocumentHash(dataHasher.getHash()).
+                        setSignature(signature).
+                        setPublicationsFile(publicationsFile).
+                        setExtenderClient(getKsiExtenderClient());
+
+        VerificationContext verificationContext = verificationContextBuilder.createVerificationContext();
+
+        // Perform verification
+        VerificationResult verificationResult = ksi.verify(verificationContext, policy);
+
+        if (verificationResult.isOk()) {
+            System.out.println("verifyUsingCustomPublicationsFileAndTrustStore > signature valid");
+        } else {
+            System.out.println("verifyUsingCustomPublicationsFileAndTrustStore > verification failed with error code > "
+                    + verificationResult.getErrorCode());
+        }
+    }
+
+    private String getDefaultTrustStorePath() {
+        return System.getProperty("java.home") + File.separatorChar + "lib" + File.separatorChar
+                + "security" + File.separatorChar + "cacerts";
     }
 }

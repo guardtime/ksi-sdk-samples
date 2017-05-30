@@ -21,6 +21,7 @@ import java.security.cert.CertSelector;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
 import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.service.client.KSIExtenderClient;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.ServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
@@ -154,5 +155,9 @@ public abstract class KsiSamples {
      */
     public File getFile(String resourceName) {
         return new File(getClass().getClassLoader().getResource(resourceName).getFile());
+    }
+
+    public KSIExtenderClient getKsiExtenderClient(){
+        return simpleHttpClient;
     }
 }
