@@ -20,7 +20,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using Guardtime.KSI.Crypto.Microsoft.Hashing;
+using Guardtime.KSI;
 using Guardtime.KSI.Hashing;
 using Guardtime.KSI.Publication;
 using Guardtime.KSI.Signature;
@@ -48,14 +48,15 @@ namespace Guardtime.Ksi.Samples
             // We need to compute the hash from the original data, to make sure it
             // matches the one in the signature and has not been changed
             // Use the same algorithm as the input hash in the signature
-            IDataHasher dataHasher = new DataHasher(signature.GetAggregationHashChains()[0].InputHash.Algorithm);
-            dataHasher.AddData(File.ReadAllBytes("Resources/infile.txt"));
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
 
             // Do the verification and check the result
             VerificationPolicy policy = new PublicationBasedVerificationPolicy();
             VerificationContext context = new VerificationContext(signature)
             {
-                DocumentHash = dataHasher.GetHash(),
+                DocumentHash = documentHash,
                 PublicationsFile = ksi.GetPublicationsFile(),
             };
             VerificationResult verificationResult = policy.Verify(context);
@@ -79,8 +80,9 @@ namespace Guardtime.Ksi.Samples
             // Read the existing signature, assume it is extended
             IKsiSignature signature = LoadExtendedSignature();
 
-            IDataHasher dataHasher = new DataHasher(signature.GetAggregationHashChains()[0].InputHash.Algorithm);
-            dataHasher.AddData(File.ReadAllBytes("Resources/infile.txt"));
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
 
             // The trust anchor in this example is the publication code in Financial Times or on Twitter
             PublicationData publicationData = new PublicationData("AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM");
@@ -90,7 +92,7 @@ namespace Guardtime.Ksi.Samples
 
             VerificationContext context = new VerificationContext(signature)
             {
-                DocumentHash = dataHasher.GetHash(),
+                DocumentHash = documentHash,
                 UserPublication = publicationData
             };
             VerificationResult verificationResult = policy.Verify(context);
@@ -116,8 +118,9 @@ namespace Guardtime.Ksi.Samples
             // Read signature, assume to be not extended
             IKsiSignature signature = LoadUnextendedSignature();
 
-            IDataHasher dataHasher = new DataHasher(signature.GetAggregationHashChains()[0].InputHash.Algorithm);
-            dataHasher.AddData(File.ReadAllBytes("Resources/infile.txt"));
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
 
             PublicationData publicationData = new PublicationData("AAAAAA-CWYEKQ-AAIYPA-UJ4GRT-HXMFBE-OTB4AB-XH3PT3-KNIKGV-PYCJXU-HL2TN4-RG6SCC-3ZGSBM");
 
@@ -126,7 +129,7 @@ namespace Guardtime.Ksi.Samples
 
             VerificationContext context = new VerificationContext(signature)
             {
-                DocumentHash = dataHasher.GetHash(),
+                DocumentHash = documentHash,
                 UserPublication = publicationData,
                 IsExtendingAllowed = true,
                 KsiService = GetKsiService(),
@@ -155,13 +158,14 @@ namespace Guardtime.Ksi.Samples
             // Read signature, assume to be not extended
             IKsiSignature signature = LoadUnextendedSignature();
 
-            IDataHasher dataHasher = new DataHasher(signature.GetAggregationHashChains()[0].InputHash.Algorithm);
-            dataHasher.AddData(File.ReadAllBytes("Resources/infile.txt"));
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
 
             VerificationPolicy policy = new KeyBasedVerificationPolicy(new X509Store(StoreName.Root), GetCertificateSubjectRdnSelector());
             VerificationContext context = new VerificationContext(signature)
             {
-                DocumentHash = dataHasher.GetHash(),
+                DocumentHash = documentHash,
                 PublicationsFile = ksi.GetPublicationsFile(),
             };
 
@@ -185,13 +189,14 @@ namespace Guardtime.Ksi.Samples
         {
             IKsiSignature signature = LoadUnextendedSignature();
 
-            IDataHasher dataHasher = new DataHasher(signature.GetAggregationHashChains()[0].InputHash.Algorithm);
-            dataHasher.AddData(File.ReadAllBytes("Resources/infile.txt"));
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
 
             VerificationPolicy policy = new CalendarBasedVerificationPolicy();
             VerificationContext context = new VerificationContext(signature)
             {
-                DocumentHash = dataHasher.GetHash(),
+                DocumentHash = documentHash,
                 KsiService = GetKsiService(),
             };
 

@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Linq;
 using Guardtime.KSI.Signature;
 using Guardtime.KSI.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,7 +56,8 @@ namespace Guardtime.Ksi.Samples
 
             foreach (AggregationHashChain ahc in signature.GetAggregationHashChains())
             {
-                Console.WriteLine("PrintAggregationHashChain > chain identity > " + ahc.GetChainIdentity());
+                Console.WriteLine("PrintAggregationHashChain > chain identity > " +
+                                  string.Join("::", ahc.GetIdentity().Select(i => i.ClientId).ToArray()));
             }
         }
 
@@ -79,7 +81,7 @@ namespace Guardtime.Ksi.Samples
         {
             IKsiSignature signature = LoadExtendedSignature();
 
-            Console.WriteLine("PrintIdentity > " + signature.Identity);
+            Console.WriteLine("PrintIdentity > " + string.Join("::", signature.GetIdentity().Select(i => i.ClientId).ToArray()));
         }
 
         /// <summary>
