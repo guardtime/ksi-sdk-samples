@@ -68,7 +68,7 @@ public class ExtendingSamples extends KsiSamples {
     public void printPublicationInfo() throws IOException, KSIException, ParseException {
         KSI ksi = getKsi();
 
-        Date publicationDate = new SimpleDateFormat("YYYY-MM-dd").parse("2016-02-01");
+        Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-02-01");
         PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
 
         for (String s : publicationRecord.getPublicationReferences()) {
