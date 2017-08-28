@@ -14,33 +14,30 @@
  */
 package com.guardtime.ksi.samples;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
+import com.guardtime.ksi.Extender;
+import com.guardtime.ksi.PublicationsHandler;
+import com.guardtime.ksi.Reader;
+import com.guardtime.ksi.Verifier;
+import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.hashing.DataHasher;
+import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.PublicationsFile;
 import com.guardtime.ksi.publication.PublicationsFileFactory;
 import com.guardtime.ksi.publication.inmemory.InMemoryPublicationsFileFactory;
 import com.guardtime.ksi.trust.JKSTrustStore;
 import com.guardtime.ksi.trust.PKITrustStore;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.verifier.VerificationResult;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
+import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.guardtime.ksi.KSI;
-import com.guardtime.ksi.exceptions.KSIException;
-import com.guardtime.ksi.hashing.DataHasher;
-import com.guardtime.ksi.publication.PublicationData;
-import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.VerificationContext;
-import com.guardtime.ksi.unisignature.verifier.VerificationContextBuilder;
-import com.guardtime.ksi.unisignature.verifier.VerificationResult;
-import com.guardtime.ksi.unisignature.verifier.policies.CalendarBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
-import com.guardtime.ksi.unisignature.verifier.policies.PublicationsFileBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.UserProvidedPublicationBasedVerificationPolicy;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class VerificationSamples extends KsiSamples {
 
@@ -60,10 +57,12 @@ public class VerificationSamples extends KsiSamples {
      */
     @Test
     public void verifyExtendedSignatureUsingPublicationsFile() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Verifier verifier = getVerifier();
+        PublicationsHandler publicationsHandler = getPublicationsHandler();
 
         // Read the existing signature, assume it is extended
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         // We need to compute the hash from the original data, to make sure it
         // matches the one in the signature and has not been changed
@@ -72,8 +71,8 @@ public class VerificationSamples extends KsiSamples {
         dataHasher.addData(getFile("signme.txt"));
 
         // Do the verification and check the result
-        Policy policy = new PublicationsFileBasedVerificationPolicy();
-        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createPublicationsFilePolicy(publicationsHandler);
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyExtendedSignatureUsingPublicationsFile > signature valid");
@@ -88,9 +87,11 @@ public class VerificationSamples extends KsiSamples {
      */
     @Test
     public void verifyExtendedSignatureUsingPublicationsCode() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Verifier verifier = getVerifier();
+        Extender extender = getExtender();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
@@ -101,8 +102,8 @@ public class VerificationSamples extends KsiSamples {
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
-        Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
-        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash(), publicationData);
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createUserProvidedPublicationPolicy(publicationData, extender);
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyExtendedSignatureUsingPublicationsCode > signature valid");
@@ -120,10 +121,12 @@ public class VerificationSamples extends KsiSamples {
      */
     @Test
     public void verifyExtendedSignatureUsingPublicationsCodeAutoExtend() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Verifier verifier = getVerifier();
+        Extender extender = getExtender();
 
         // Read signature, assume to be not extended
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
@@ -132,14 +135,8 @@ public class VerificationSamples extends KsiSamples {
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
-        Policy policy = new UserProvidedPublicationBasedVerificationPolicy();
-
-        VerificationContext context = new VerificationContextBuilder().setDocumentHash(dataHasher.getHash())
-                .setExtendingAllowed(true).setExtenderClient(getSimpleHttpClient()).setSignature(signature)
-                .setUserPublication(publicationData).setPublicationsFile(ksi.getPublicationsFile())
-                .createVerificationContext();
-
-        VerificationResult verificationResult = ksi.verify(context, policy);
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createUserProvidedPublicationPolicy(publicationData, extender);
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyExtendedSignatureUsingPublicationsCodeAutoExtend > signature valid");
@@ -155,15 +152,16 @@ public class VerificationSamples extends KsiSamples {
      */
     @Test
     public void verifyKeyBased() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Verifier verifier = getVerifier();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        Policy policy = new KeyBasedVerificationPolicy();
-        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createKeyPolicy(getPublicationsHandler());
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyKeyBased > signature valid");
@@ -178,15 +176,17 @@ public class VerificationSamples extends KsiSamples {
      */
     @Test
     public void verifyCalendarBasedUnextended() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Verifier verifier = getVerifier();
+        Extender extender = getExtender();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        Policy policy = new CalendarBasedVerificationPolicy();
-        VerificationResult verificationResult = ksi.verify(signature, policy, dataHasher.getHash());
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createCalendarPolicy(extender);
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyCalendarBasedUnextended > signature valid");
@@ -217,31 +217,32 @@ public class VerificationSamples extends KsiSamples {
         // The next step is to read in the publications file from a custom input stream and use
         // the custom trust store from above for its verification. In the current case we read the publications file from local file system.
         PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
-        PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-30.05.2017.bin")));
+        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-30.05.2017.bin")));
+
 
         // Now the "usual" verification of the KSI signature follows where
         // the custom publications file from is used in the verification context.
-        KSI ksi = getKsi();
+
+        Verifier verifier = getVerifier();
+        Reader reader = getReader();
+
+        PublicationsHandler publicationsHandler = new PublicationsHandler() {
+            public PublicationsFile getPublicationsFile() throws KSIException {
+                return publicationsFile;
+            }
+        };
+
+        ContextAwarePolicy contextAwarePolicy = ContextAwarePolicyAdapter.createPublicationsFilePolicy(publicationsHandler);
 
         // Read the existing signature, assume it is extended
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         // As usual, hash the data to be verified
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        // Establish the verification policy and context
-        Policy policy = new PublicationsFileBasedVerificationPolicy();
-        VerificationContextBuilder verificationContextBuilder =
-                new VerificationContextBuilder().setDocumentHash(dataHasher.getHash()).
-                        setSignature(signature).
-                        setPublicationsFile(publicationsFile).
-                        setExtenderClient(getKsiExtenderClient());
-
-        VerificationContext verificationContext = verificationContextBuilder.createVerificationContext();
-
         // Perform verification
-        VerificationResult verificationResult = ksi.verify(verificationContext, policy);
+        VerificationResult verificationResult = verifier.verify(signature, dataHasher.getHash(), contextAwarePolicy);
 
         if (verificationResult.isOk()) {
             System.out.println("verifyUsingCustomPublicationsFileAndTrustStore > signature valid");
