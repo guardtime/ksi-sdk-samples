@@ -14,43 +14,33 @@
  */
 package com.guardtime.ksi.samples;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.Extender;
+import com.guardtime.ksi.PublicationsHandler;
+import com.guardtime.ksi.Reader;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.PublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Samples related to extending KSI signatures.
  */
 public class ExtendingSamples extends KsiSamples {
 
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
-
     /**
      * Check if signature has been extended to a publication or not.
      */
     @Test
     public void checkExtended() throws IOException, KSIException {
-        KSI ksi = getKsi();
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        Reader reader = getReader();
+
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         if (signature.isExtended()) {
             System.out.println(
@@ -66,10 +56,10 @@ public class ExtendingSamples extends KsiSamples {
      */
     @Test
     public void printPublicationInfo() throws IOException, KSIException, ParseException {
-        KSI ksi = getKsi();
+        PublicationsHandler publicationsHandler = getPublicationsHandler();
 
         Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-02-01");
-        PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
+        PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);
 
         for (String s : publicationRecord.getPublicationReferences()) {
             System.out.println("printPublicationInfo > publication reference > " + s);
@@ -82,14 +72,17 @@ public class ExtendingSamples extends KsiSamples {
      */
     @Test
     public void reExtendToLatestPublication() throws IOException, KSIException {
-        KSI ksi = getKsi();
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        Reader reader = getReader();
+        Extender extender = getExtender();
+        PublicationsHandler publicationsHandler = getPublicationsHandler();
 
-        PublicationRecord latestPublicationRecord = ksi.getPublicationsFile().getLatestPublication();
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
+
+        PublicationRecord latestPublicationRecord = publicationsHandler.getPublicationsFile().getLatestPublication();
         Date latestPublicationTime = latestPublicationRecord.getPublicationTime();
         if (!signature.isExtended()
                 || signature.getPublicationRecord().getPublicationTime().before(latestPublicationTime)) {
-            KSISignature extendedSignature = ksi.extend(signature, latestPublicationRecord);
+            KSISignature extendedSignature = extender.extend(signature, latestPublicationRecord);
 
             if (extendedSignature.isExtended()) {
                 System.out.println("reExtendToLatestPublication > signature extended to publication > "
@@ -106,16 +99,17 @@ public class ExtendingSamples extends KsiSamples {
      */
     @Test
     public void extendToClosestPublication() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Extender extender = getExtender();
 
         // Read an existing signature from file, assume it to be not extended
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         // Extends the signature to the closest publication found in the
         // publications file
         // Assumes signature is not extended and at least one publication after
         // the signature obtained
-        KSISignature extendedSignature = ksi.extend(signature);
+        KSISignature extendedSignature = extender.extend(signature);
 
         // Double check if signature was extended
         if (extendedSignature.isExtended()) {
@@ -134,17 +128,19 @@ public class ExtendingSamples extends KsiSamples {
      */
     @Test
     public void extendToGivenPublicationDate() throws IOException, KSIException, ParseException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
+        Extender extender = getExtender();
+        PublicationsHandler publicationsHandler = getPublicationsHandler();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
         Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-03-01");
 
-        PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
+        PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);
 
         System.out.println("extendToGivenPublicationDate > trying to extend signature to publication > "
                 + publicationRecord.getPublicationTime());
 
-        KSISignature extendedSignature = ksi.extend(signature, publicationRecord);
+        KSISignature extendedSignature = extender.extend(signature, publicationRecord);
 
         if (extendedSignature.isExtended()) {
             System.out.println("extendToGivenPublicationDate > signature extended to publication > "
@@ -162,16 +158,19 @@ public class ExtendingSamples extends KsiSamples {
      */
     @Test
     public void extendToGivenPublicationCode() throws IOException, KSIException, ParseException {
-        KSI ksi = getKsi();
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        Reader reader = getReader();
+        PublicationsHandler publicationsHandler = getPublicationsHandler();
+        Extender extender = getExtender();
+
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         // Publication code for 15.03.2016
         Date publicationDate = new PublicationData(
                 "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V")
-                        .getPublicationTime();
+                .getPublicationTime();
 
-        PublicationRecord publicationRecord = ksi.getPublicationsFile().getPublicationRecord(publicationDate);
-        KSISignature extendedSignature = ksi.extend(signature, publicationRecord);
+        PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);
+        KSISignature extendedSignature = extender.extend(signature, publicationRecord);
 
         if (extendedSignature.isExtended()) {
             System.out.println("extendToGivenPublicationCode > signature extended to publication > "
