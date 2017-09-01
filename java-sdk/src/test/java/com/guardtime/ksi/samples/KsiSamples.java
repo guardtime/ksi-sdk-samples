@@ -129,7 +129,7 @@ public abstract class KsiSamples {
 
         // Create extender for extending KSI signatures
         ksiExtenderClient = new SimpleHttpExtenderClient(new CredentialsAwareHttpSettings(extenderUrl, credentials));
-        extender = new ExtenderBuilder().setExtendingService(new KSIExtendingClientServiceAdapter(ksiExtenderClient)).setKsiProtocolPublicationsFileClient(ksiPublicationsFileClient).setPublicationsFileCertificateConstraints(certSelector).build();
+        extender = new ExtenderBuilder().setExtendingService(new KSIExtendingClientServiceAdapter(ksiExtenderClient)).setPublicationsHandler(publicationsHandler).build();
 
         // Create verifier for verifying signatures
         verifier = new SignatureVerifier();
