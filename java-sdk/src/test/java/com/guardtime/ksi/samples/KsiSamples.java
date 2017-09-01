@@ -26,7 +26,8 @@ import com.guardtime.ksi.service.http.simple.SimpleHttpPublicationsFileClient;
 import com.guardtime.ksi.service.http.simple.SimpleHttpSigningClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 import com.guardtime.ksi.unisignature.Identity;
-import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
+import org.junit.After;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +97,8 @@ public abstract class KsiSamples {
      * points of the Aggregator and Extender services, the publications file location and the
      * credentials to access the services. Called from sub-classes before running the tests.
      */
-    protected void setUpKsi() throws KSIException {
+    @Before
+    public void setUpKsi() throws KSIException {
         // Get the Aggregator and Extender service end point URLs from JVM
         // properties
         aggregatorUrl = System.getProperty("aggregator.url");
@@ -116,8 +118,8 @@ public abstract class KsiSamples {
         certSelector = new X509CertificateSubjectRdnSelector("E=publications@guardtime.com");
 
         // Create reader for reading existing KSI signatures, each signature read is automatically verified
-        // using
-        reader = new SignatureReader(ContextAwarePolicyAdapter.createInternalPolicy());
+        // using internal verification policy. User can specify other policy when initializing the reader.
+        reader = new SignatureReader();
 
         // Create the signer for signing data
         ksiSigningClient = new SimpleHttpSigningClient(new CredentialsAwareHttpSettings(aggregatorUrl, credentials));
@@ -139,7 +141,8 @@ public abstract class KsiSamples {
     /**
      * Close resources after the tests have been finished. Called from sub-classes.
      */
-    protected void tearDownKsi() {
+    @After
+    public void tearDownKsi() {
         try {
             if (signer != null)
                 signer.close();

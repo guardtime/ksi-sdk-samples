@@ -14,7 +14,6 @@
  */
 package com.guardtime.ksi.samples;
 
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.PublicationsHandler;
 import com.guardtime.ksi.Signer;
 import com.guardtime.ksi.Verifier;
@@ -27,13 +26,10 @@ import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
-import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.naming.Context;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -41,16 +37,6 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class SigningSamples extends KsiSamples {
-
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
 
     /**
      * Creates a sample file, then signs it and stores the signature in a file.

@@ -15,15 +15,12 @@
 package com.guardtime.ksi.samples;
 
 import com.guardtime.ksi.Extender;
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.PublicationsHandler;
 import com.guardtime.ksi.Reader;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.publication.PublicationRecord;
 import com.guardtime.ksi.unisignature.KSISignature;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,16 +32,6 @@ import java.util.Date;
  * Samples related to extending KSI signatures.
  */
 public class ExtendingSamples extends KsiSamples {
-
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
 
     /**
      * Check if signature has been extended to a publication or not.

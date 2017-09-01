@@ -31,8 +31,6 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.verifier.VerificationResult;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -40,16 +38,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class VerificationSamples extends KsiSamples {
-
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
 
     /**
      * Verifies signature against a publication using the publications in the publication file. The

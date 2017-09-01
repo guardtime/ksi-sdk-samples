@@ -14,28 +14,15 @@
  */
 package com.guardtime.ksi.samples;
 
-import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.Reader;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.*;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
 public class SignatureContentSamples extends KsiSamples {
-
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
 
     /**
      * Prints information found in the given signature's publication record.
