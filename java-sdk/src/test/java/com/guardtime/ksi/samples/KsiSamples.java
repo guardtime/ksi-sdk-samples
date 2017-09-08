@@ -121,6 +121,15 @@ public abstract class KsiSamples {
         // using internal verification policy. User can specify other policy when initializing the reader.
         reader = new SignatureReader();
 
+        // If you need to use HTTP proxy, uncomment the following, fill in the appropriate proxy settings
+        // and then provide the HTTPConnectionParameters as an additional argument to the CredentialsAwareHttpSettings constructor.
+
+        // HTTPConnectionParameters httpConnectionParameters =
+        //        new HTTPConnectionParameters();
+        // httpConnectionParameters.setProxyUrl(new URL("http://141.28.176.254:3128"));
+        // httpConnectionParameters.setProxyUser("proxy-username");
+        // httpConnectionParameters.setProxyPassword("proxy-password");
+
         // Create the signer for signing data
         ksiSigningClient = new SimpleHttpSigningClient(new CredentialsAwareHttpSettings(aggregatorUrl, credentials));
         signer = new SignerBuilder().setSigningService(new KSISigningClientServiceAdapter(ksiSigningClient)).build();
