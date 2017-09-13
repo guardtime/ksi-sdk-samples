@@ -17,10 +17,14 @@
  * reserves and retains all trademark rights.
  */
 
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 using Guardtime.KSI;
 using Guardtime.KSI.Hashing;
+using Guardtime.KSI.Service;
 using Guardtime.KSI.Signature;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -108,6 +112,73 @@ namespace Guardtime.Ksi.Samples
             //{
             //    signature.WriteTo(stream);
             //}
+        }
+
+        /// <summary>
+        /// Signs numbers 1 - 50 (as text) using client side aggregation (block signer). The Merkle tree
+        /// is built locally and only a single request is sent to KSI Gateway. For each item individual
+        /// KSI signature is returned. This helps achieving a great performance when a huge number of
+        /// files are needed to be signed without overloading the KSI GW.
+        /// </summary>
+        [TestMethod]
+        public void SignMultipleItemsWithLocalAggregation()
+        {
+            BlockSigner ksiBlockSigner = new BlockSigner(GetKsiService());
+            int itemCount = 50;
+
+            // Add the items that need to be signed to the block signer
+            IDataHasher dh = KsiProvider.CreateDataHasher(HashAlgorithm.Sha2256);
+
+            for (int i = 1; i <= itemCount; i++)
+            {
+                dh.Reset();
+                dh.AddData(Encoding.UTF8.GetBytes(i.ToString()));
+                ksiBlockSigner.Add(dh.GetHash());
+            }
+
+            // Submit the signing request
+            IEnumerable<IKsiSignature> signatures = ksiBlockSigner.Sign();
+
+            // Just to illustrate that there are as many signatures as items
+            Assert.AreEqual(itemCount, signatures.Count());
+            // Store the signatures as needed
+            // ...
+        }
+
+        /// <summary>
+        /// Besides performance optimization, client side aggregation can be also used by embedding
+        /// metadata. This can be used, for instance, for linking the user identity authenticated by 3rd
+        /// party provider (in the same way as KSI GW does for its users). Although, the metadata fields
+        /// are fixed and named after how KSI infrastructure uses them, its up to the use case what is
+        /// the content and interpretation of metadata to be embedded, KSI signature just ensures its
+        /// integrity.
+        /// </summary>
+        [TestMethod]
+        public void LinkUserIdToSignature()
+        {
+            BlockSigner ksiBlockSigner = new BlockSigner(GetKsiService());
+            IDataHasher dh = KsiProvider.CreateDataHasher(HashAlgorithm.Sha2256);
+
+            // This is the data we are signing
+            string data = "data";
+            dh.AddData(Encoding.UTF8.GetBytes(data));
+
+            // Suppose that this is the user that initiated the signing
+            // and it has been verified using a 3rd party authentication provider (e.g. LDAP)
+            string userId = "john.smith";
+
+            // Add both, the data and the user to the block signer
+            ksiBlockSigner.Add(dh.GetHash(), new IdentityMetadata(userId));
+            IKsiSignature[] signatures = ksiBlockSigner.Sign().ToArray();
+
+            // We should get only one signature as we only had one item that we signed
+            Assert.AreEqual(1, signatures.Length);
+
+            // Print the last part of the identity to show john.smith is there
+            IIdentity[] identity = signatures[0].GetIdentity().ToArray();
+            Console.WriteLine("User: " + identity[identity.Length - 1].ClientId);
+            // Store the signature as needed
+            // ...
         }
     }
 }
