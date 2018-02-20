@@ -35,8 +35,75 @@ namespace Guardtime.Ksi.Samples
 
     {
         /// <summary>
-        /// Verifies signature against a publication using the publications in the publication file. The
-        /// signature must be extended for the verification to succeed.</summary>
+        /// Verifies unextended signature using simple wrapper and default verification policy.
+        /// </summary>
+        [TestMethod]
+        public void VerifyUnextendedSignatureUsingDefaultPolicy()
+        {
+            // Create simple wrapper.
+            KSI.Ksi ksi = GetKsi();
+
+            // Read signature, assume to be not extended
+            IKsiSignature signature = LoadUnextendedSignature();
+
+            // We need to compute the hash from the original data, to make sure it
+            // matches the one in the signature and has not been changed
+            // Use the same algorithm as the input hash in the signature
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
+
+            // Do the verification and check the result.
+            // At first KSI signature is verified against given document hash.
+            // Then the signature is extended. If extending succeeds then the signature is verified 
+            // against publications file (publications file is automatically downloaded by simple wrapper).
+            // If extending is not yet possible then key based verification is done.
+            VerificationResult verificationResult = ksi.Verify(signature, documentHash);
+
+            if (verificationResult.ResultCode == VerificationResultCode.Ok)
+            {
+                Console.WriteLine("VerifyUnextendedSignatureUsingDefaultPolicy > signature valid");
+            }
+            else
+            {
+                Console.WriteLine("VerifyUnextendedSignatureUsingDefaultPolicy > verification failed with error > " + verificationResult.VerificationError);
+            }
+        }
+
+        /// <summary>
+        /// Verifies extended signature using simple wrapper and default verification policy.
+        /// </summary>
+        [TestMethod]
+        public void VerifyExtendedSignatureUsingDefaultPolicy()
+        {
+            // Create simple wrapper.
+            KSI.Ksi ksi = GetKsi();
+
+            // Read the existing signature, assume it is extended
+            IKsiSignature signature = LoadExtendedSignature();
+
+            DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
+                                               .AddData(File.ReadAllBytes("Resources/infile.txt"))
+                                               .GetHash();
+
+            // Do the verification and check the result.
+            // The signature is verified against given document hash and publications file (publications file is automatically downloaded by simple wrapper). 
+            VerificationResult verificationResult = ksi.Verify(signature, documentHash);
+
+            if (verificationResult.ResultCode == VerificationResultCode.Ok)
+            {
+                Console.WriteLine("VerifyExtendedSignatureUsingDefaultPolicy > signature valid");
+            }
+            else
+            {
+                Console.WriteLine("VerifyExtendedSignatureUsingDefaultPolicy > verification failed with error > " + verificationResult.VerificationError);
+            }
+        }
+
+        /// <summary>
+        /// Verifies signature against a publication using the publications in the publication file. 
+        /// The signature must be extended for the verification to succeed.
+        /// </summary>
         [TestMethod]
         public void VerifyExtendedSignatureUsingPublicationsFile()
         {
@@ -45,9 +112,6 @@ namespace Guardtime.Ksi.Samples
             // Read the existing signature, assume it is extended
             IKsiSignature signature = LoadExtendedSignature();
 
-            // We need to compute the hash from the original data, to make sure it
-            // matches the one in the signature and has not been changed
-            // Use the same algorithm as the input hash in the signature
             DataHash documentHash = KsiProvider.CreateDataHasher(signature.InputHash.Algorithm)
                                                .AddData(File.ReadAllBytes("Resources/infile.txt"))
                                                .GetHash();
