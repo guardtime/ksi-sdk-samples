@@ -133,7 +133,7 @@ public class ExtendingSamples extends KsiSamples {
         PublicationsHandler publicationsHandler = getPublicationsHandler();
 
         KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
-        Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-03-01");
+        Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse("2018-03-15");
 
         PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);
 
@@ -150,7 +150,6 @@ public class ExtendingSamples extends KsiSamples {
         } else {
             System.out.println("extendToGivenPublicationDate > signature not extended");
         }
-
     }
 
     /**
@@ -164,9 +163,9 @@ public class ExtendingSamples extends KsiSamples {
 
         KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
-        // Publication code for 15.03.2016
+        // Publication code for 15.05.2018
         Date publicationDate = new PublicationData(
-                "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V")
+                "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG")
                 .getPublicationTime();
 
         PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);

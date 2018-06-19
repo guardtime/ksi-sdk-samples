@@ -17,10 +17,15 @@ package com.guardtime.ksi.samples;
 import com.guardtime.ksi.Reader;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationData;
-import com.guardtime.ksi.unisignature.*;
-import org.junit.Test;
+import com.guardtime.ksi.unisignature.AggregationHashChain;
+import com.guardtime.ksi.unisignature.CalendarAuthenticationRecord;
+import com.guardtime.ksi.unisignature.CalendarHashChain;
+import com.guardtime.ksi.unisignature.KSISignature;
+import com.guardtime.ksi.unisignature.SignatureData;
+import com.guardtime.ksi.unisignature.SignaturePublicationRecord;
 
 import java.io.IOException;
+import org.junit.Test;
 
 public class SignatureContentSamples extends KsiSamples {
 

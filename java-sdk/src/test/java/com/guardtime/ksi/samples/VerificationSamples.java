@@ -86,7 +86,7 @@ public class VerificationSamples extends KsiSamples {
 
         // The trust anchor in this example is the publication code in Financial
         // Times or on Twitter
-        String pubString = "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V";
+        String pubString = "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
@@ -119,7 +119,7 @@ public class VerificationSamples extends KsiSamples {
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        String pubString = "AAAAAA-CW45II-AAKWRK-F7FBNM-KB6FNV-DYYFW7-PJQN6F-JKZWBQ-3OQYZO-HCB7RA-YNYAGA-ODRL2V";
+        String pubString = "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
@@ -205,7 +205,7 @@ public class VerificationSamples extends KsiSamples {
         // The next step is to read in the publications file from a custom input stream and use
         // the custom trust store from above for its verification. In the current case we read the publications file from local file system.
         PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
-        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-30.05.2017.bin")));
+        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-18.06.2018.bin")));
 
 
         // Now the "usual" verification of the KSI signature follows where
