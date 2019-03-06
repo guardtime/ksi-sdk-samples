@@ -1,3 +1,10 @@
 .vs
 obj
 bin
+**/.settings
+**/.classpath
+**/.idea
+**/*.iml
+**/*.project
+**/target
+

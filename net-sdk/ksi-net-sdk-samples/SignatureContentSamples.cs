@@ -70,7 +70,7 @@ namespace Guardtime.Ksi.Samples
             IKsiSignature signature = LoadExtendedSignature();
 
             Console.WriteLine("PrintCalendarHashChain > publication time > " + Util.ConvertUnixTimeToDateTime(signature.CalendarHashChain.PublicationTime));
-            Console.WriteLine("PrintCalendarHashChain > registration time > " + Util.ConvertUnixTimeToDateTime(signature.CalendarHashChain.RegistrationTime));
+            Console.WriteLine("PrintCalendarHashChain > aggregation time > " + Util.ConvertUnixTimeToDateTime(signature.CalendarHashChain.AggregationTime));
         }
 
         /// <summary>

@@ -14,13 +14,7 @@
  */
 package com.guardtime.ksi.samples;
 
-import java.io.IOException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.guardtime.ksi.KSI;
+import com.guardtime.ksi.Reader;
 import com.guardtime.ksi.exceptions.KSIException;
 import com.guardtime.ksi.publication.PublicationData;
 import com.guardtime.ksi.unisignature.AggregationHashChain;
@@ -30,26 +24,19 @@ import com.guardtime.ksi.unisignature.KSISignature;
 import com.guardtime.ksi.unisignature.SignatureData;
 import com.guardtime.ksi.unisignature.SignaturePublicationRecord;
 
+import java.io.IOException;
+import org.junit.Test;
+
 public class SignatureContentSamples extends KsiSamples {
-
-    @Before
-    public void setUp() throws KSIException {
-        setUpKsi();
-    }
-
-    @After
-    public void tearDown() {
-        tearDownKsi();
-    }
 
     /**
      * Prints information found in the given signature's publication record.
      */
     @Test
     public void printPublicationRecord() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         SignaturePublicationRecord spr = signature.getPublicationRecord();
         if (spr != null)
@@ -63,8 +50,9 @@ public class SignatureContentSamples extends KsiSamples {
      */
     @Test
     public void printAggregationHashChain() throws IOException, KSIException {
-        KSI ksi = getKsi();
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        Reader reader = getReader();
+
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         for (AggregationHashChain ahc : signature.getAggregationHashChains()) {
             System.out.println("printAggregationHashChain > link count > " + ahc.getChainLinks().size());
@@ -76,25 +64,23 @@ public class SignatureContentSamples extends KsiSamples {
      */
     @Test
     public void printCalendarHashChain() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         CalendarHashChain chc = signature.getCalendarHashChain();
         System.out.println("printCalendarHashChain > publication time > " + chc.getPublicationTime());
-        System.out.println("printCalendarHashChain > registration time > " + chc.getRegistrationTime());
-
     }
 
     /**
-     * Prints the identity in the signature.
+     * Prints the client IDs of the identity metadata in the signature.
      */
     @Test
     public void printIdentity() throws IOException, KSIException {
-        KSI ksi = getKsi();
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        Reader reader = getReader();
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
-        System.out.println("printIdentity > " + signature.getIdentity());
+        System.out.println(identityClientIdToString(signature.getAggregationHashChainIdentity()));
     }
 
     /**
@@ -102,9 +88,9 @@ public class SignatureContentSamples extends KsiSamples {
      */
     @Test
     public void printSigningTime() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.extended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.extended-ksig"));
 
         System.out.println("printSigningTime > " + signature.getAggregationTime());
     }
@@ -114,9 +100,9 @@ public class SignatureContentSamples extends KsiSamples {
      */
     @Test
     public void printCalendarAuthenticationRecord() throws IOException, KSIException {
-        KSI ksi = getKsi();
+        Reader reader = getReader();
 
-        KSISignature signature = ksi.read(getFile("signme.txt.unextended-ksig"));
+        KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
         CalendarAuthenticationRecord car = signature.getCalendarAuthenticationRecord();
         PublicationData publicationData = car.getPublicationData();

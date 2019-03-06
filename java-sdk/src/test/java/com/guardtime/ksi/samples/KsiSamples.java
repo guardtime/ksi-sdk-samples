@@ -14,18 +14,24 @@
  */
 package com.guardtime.ksi.samples;
 
+import com.guardtime.ksi.*;
+import com.guardtime.ksi.exceptions.KSIException;
+import com.guardtime.ksi.service.KSIExtendingClientServiceAdapter;
+import com.guardtime.ksi.service.KSISigningClientServiceAdapter;
+import com.guardtime.ksi.service.client.*;
+import com.guardtime.ksi.service.client.http.CredentialsAwareHttpSettings;
+import com.guardtime.ksi.service.client.http.HttpSettings;
+import com.guardtime.ksi.service.http.simple.SimpleHttpExtenderClient;
+import com.guardtime.ksi.service.http.simple.SimpleHttpPublicationsFileClient;
+import com.guardtime.ksi.service.http.simple.SimpleHttpSigningClient;
+import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
+import com.guardtime.ksi.unisignature.Identity;
+import org.junit.After;
+import org.junit.Before;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertSelector;
-
-import com.guardtime.ksi.KSI;
-import com.guardtime.ksi.KSIBuilder;
-import com.guardtime.ksi.exceptions.KSIException;
-import com.guardtime.ksi.service.client.KSIServiceCredentials;
-import com.guardtime.ksi.service.client.ServiceCredentials;
-import com.guardtime.ksi.service.client.http.HttpClientSettings;
-import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
-import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 
 /**
  * The samples are implemented as JUnit tests. This is the base class that contains the common parts
@@ -71,23 +77,28 @@ public abstract class KsiSamples {
     /**
      * The modularity of KSI Java SDK enables multiple implementations of the "clients" for signing,
      * extending in communication with the KSI Gateway. In these examples we use the
-     * SimpleHttpClient implementation.
+     * SimpleHttpClient implementation (see details in {@link #setUpKsi()}.
      */
-    private SimpleHttpClient simpleHttpClient;
+    private KSISigningClient ksiSigningClient;
+    private KSIExtenderClient ksiExtenderClient;
+    private KSIPublicationsFileClient ksiPublicationsFileClient;
 
     /**
-     * This is the KSI context which holds the references to the Aggregation service, Extender
-     * service and other configuration data to perform the various operations. See
-     * {@link #setUpKsi()} for how it is set up.
+     * The end-user interfaces for the various KSI operations.
      */
-    private KSI ksi;
+    private Signer signer;
+    private Extender extender;
+    private Reader reader;
+    private PublicationsHandler publicationsHandler;
+    private Verifier verifier;
 
     /**
-     * Setup KSI context before running the samples / tests in sub-classes by specifying the end
+     * Initialize instances for the end-user interfaces before running the samples / tests in sub-classes by specifying the end
      * points of the Aggregator and Extender services, the publications file location and the
      * credentials to access the services. Called from sub-classes before running the tests.
      */
-    protected void setUpKsi() throws KSIException {
+    @Before
+    public void setUpKsi() throws KSIException {
         // Get the Aggregator and Extender service end point URLs from JVM
         // properties
         aggregatorUrl = System.getProperty("aggregator.url");
@@ -106,53 +117,100 @@ public abstract class KsiSamples {
         // that have issued to the particular e-mail address
         certSelector = new X509CertificateSubjectRdnSelector("E=publications@guardtime.com");
 
-        // Setup KSI context, we use the SimpleHttpClient so we provide the
-        // settings through the HttpClientSettings class
-        HttpClientSettings settings =
-                new HttpClientSettings(aggregatorUrl, extenderUrl, publicationsFileUrl, credentials);
+        // Create reader for reading existing KSI signatures, each signature read is automatically verified
+        // using internal verification policy. User can specify other policy when initializing the reader.
+        reader = new SignatureReader();
 
-        simpleHttpClient = new SimpleHttpClient(settings);
+        // If you need to use HTTP proxy, uncomment the following, fill in the appropriate proxy settings
+        // and then provide the HTTPConnectionParameters as an additional argument to the CredentialsAwareHttpSettings constructor.
 
-        ksi = new KSIBuilder().setKsiProtocolSignerClient(simpleHttpClient)
-                .setKsiProtocolExtenderClient(simpleHttpClient).setKsiProtocolPublicationsFileClient(simpleHttpClient)
-                .setPublicationsFileTrustedCertSelector(certSelector).build();
+        // HTTPConnectionParameters httpConnectionParameters =
+        //        new HTTPConnectionParameters();
+        // httpConnectionParameters.setProxyUrl(new URL("http://141.28.176.254:3128"));
+        // httpConnectionParameters.setProxyUser("proxy-username");
+        // httpConnectionParameters.setProxyPassword("proxy-password");
+
+        // Create the signer for signing data
+        ksiSigningClient = new SimpleHttpSigningClient(new CredentialsAwareHttpSettings(aggregatorUrl, credentials));
+        signer = new SignerBuilder().setSigningService(new KSISigningClientServiceAdapter(ksiSigningClient)).build();
+
+        // Create publications handler to be used for signature extending and verification
+        ksiPublicationsFileClient = new SimpleHttpPublicationsFileClient(new HttpSettings(publicationsFileUrl));
+        publicationsHandler = new PublicationsHandlerBuilder().setKsiProtocolPublicationsFileClient(ksiPublicationsFileClient).setPublicationsFileCertificateConstraints(certSelector).build();
+
+        // Create extender for extending KSI signatures
+        ksiExtenderClient = new SimpleHttpExtenderClient(new CredentialsAwareHttpSettings(extenderUrl, credentials));
+        extender = new ExtenderBuilder().setExtendingService(new KSIExtendingClientServiceAdapter(ksiExtenderClient)).setPublicationsHandler(publicationsHandler).build();
+
+        // Create verifier for verifying signatures
+        verifier = new SignatureVerifier();
     }
 
-    /**
-     * Close KSI after the tests have been finished. Called from sub-classes.
-     */
-    protected void tearDownKsi() {
-        if (ksi == null)
-            return;
 
+    /**
+     * Close resources after the tests have been finished. Called from sub-classes.
+     */
+    @After
+    public void tearDownKsi() {
         try {
-            ksi.close();
+            if (signer != null)
+                signer.close();
+            if (extender != null)
+                extender.close();
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
     }
 
-    /**
-     * Make the KSI context accessible to the samples in the sub-classes.
-     */
-    protected KSI getKsi() {
-        return ksi;
+
+    protected Signer getSigner() {
+        return signer;
     }
 
-    /**
-     * Make the client accessible to the samples in the sub-classes.
-     */
-    protected SimpleHttpClient getSimpleHttpClient() {
-        return simpleHttpClient;
+    protected Extender getExtender() {
+        return extender;
     }
+
+    protected Reader getReader() {
+        return reader;
+    }
+
+    protected PublicationsHandler getPublicationsHandler() {
+        return publicationsHandler;
+    }
+
+    protected Verifier getVerifier() {
+        return verifier;
+    }
+
+    protected KSISigningClient getKsiSigningClient() {
+        return ksiSigningClient;
+    }
+
 
     /**
      * Utility method to access the file in the test/resources folder.
-     * 
+     *
      * @param resourceName The name of the file.
      * @return The file.
      */
     public File getFile(String resourceName) {
         return new File(getClass().getClassLoader().getResource(resourceName).getFile());
+    }
+
+    /**
+     * Converts the client ID found in the identity chain to a string using
+     * 'space,colon,colon,space' as a separator.
+     *
+     * @return Client ID from identity metadata as string.
+     */
+    public String identityClientIdToString(Identity[] identity) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int k = 0; k < identity.length; k++) {
+            stringBuilder.append(identity[k].getDecodedClientId());
+            if (k < identity.length - 1)
+                stringBuilder.append(" :: ");
+        }
+        return stringBuilder.toString();
     }
 }
