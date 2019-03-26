@@ -205,7 +205,7 @@ public class VerificationSamples extends KsiSamples {
         // The next step is to read in the publications file from a custom input stream and use
         // the custom trust store from above for its verification. In the current case we read the publications file from local file system.
         PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
-        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-18.06.2018.bin")));
+        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-26.03.2019.bin")));
 
 
         // Now the "usual" verification of the KSI signature follows where
