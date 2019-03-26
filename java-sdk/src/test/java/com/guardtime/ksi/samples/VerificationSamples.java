@@ -33,9 +33,8 @@ import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 
 public class VerificationSamples extends KsiSamples {
 
@@ -203,10 +202,12 @@ public class VerificationSamples extends KsiSamples {
         PKITrustStore trustStore = new JKSTrustStore(getDefaultTrustStorePath(), new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"));
 
         // The next step is to read in the publications file from a custom input stream and use
-        // the custom trust store from above for its verification. In the current case we read the publications file from local file system.
-        PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
-        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(getFile("ksi-publications-18.06.2018.bin")));
+        // the custom trust store from above for its verification. In the current case we read the publications file from temporary
+        // local file where we have downloaded the publications file content on the fly as part of this test.
+        File cachedLocalPublicationsFile = downloadPublicationsFile();
 
+        PublicationsFileFactory pubFileFactory = new InMemoryPublicationsFileFactory(trustStore);
+        final PublicationsFile publicationsFile = pubFileFactory.create(new FileInputStream(cachedLocalPublicationsFile));
 
         // Now the "usual" verification of the KSI signature follows where
         // the custom publications file from is used in the verification context.
@@ -243,5 +244,24 @@ public class VerificationSamples extends KsiSamples {
     private String getDefaultTrustStorePath() {
         return System.getProperty("java.home") + File.separatorChar + "lib" + File.separatorChar
                 + "security" + File.separatorChar + "cacerts";
+    }
+
+    private File downloadPublicationsFile() throws IOException {
+        File file = File.createTempFile("ksi-publications", ".bin");
+        file.deleteOnExit();
+
+        System.out.println("Downloading publications file to temporary file " + file.getAbsolutePath());
+
+        try (BufferedInputStream inputStream = new BufferedInputStream(new URL(System.getProperty("publications.file.url", "http://verify.guardtime.com/ksi-publications.bin")).openStream());
+             FileOutputStream outputStream = new FileOutputStream(file)) {
+
+            byte data[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(data, 0, 1024)) != -1) {
+                outputStream.write(data, 0, bytesRead);
+            }
+        }
+
+        return file;
     }
 }

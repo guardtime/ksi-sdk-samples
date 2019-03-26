@@ -7,4 +7,7 @@ bin
 **/*.iml
 **/*.project
 **/target
+**/sample-file-for-signing.txt
+**/sample-file-for-signing.txt.ksig
+
 
