@@ -33,7 +33,11 @@ import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicy;
 import com.guardtime.ksi.unisignature.verifier.policies.ContextAwarePolicyAdapter;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 
 public class VerificationSamples extends KsiSamples {
@@ -248,6 +252,8 @@ public class VerificationSamples extends KsiSamples {
 
     private File downloadPublicationsFile() throws IOException {
         File file = File.createTempFile("ksi-publications", ".bin");
+        file.deleteOnExit();
+
         System.out.println("Downloading publications file to temporary file " + file.getAbsolutePath());
 
         BufferedInputStream inputStream = new BufferedInputStream(new URL(System.getProperty("publications.file.url", "http://verify.guardtime.com/ksi-publications.bin")).openStream());
