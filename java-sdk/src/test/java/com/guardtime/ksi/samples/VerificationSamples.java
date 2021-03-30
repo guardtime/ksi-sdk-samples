@@ -85,7 +85,7 @@ public class VerificationSamples extends KsiSamples {
 
         // The trust anchor in this example is the publication code in Financial
         // Times or on Twitter
-        String pubString = "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG";
+        String pubString = "AAAAAA-DAJ2RY-AAPEXJ-OKYGMI-CUI6CQ-5RAY42-XMVSLK-KKWLCE-44CIF3-FNU7ST-QCUJ4M-UFO64S";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result
@@ -118,7 +118,7 @@ public class VerificationSamples extends KsiSamples {
         DataHasher dataHasher = new DataHasher(signature.getInputHash().getAlgorithm());
         dataHasher.addData(getFile("signme.txt"));
 
-        String pubString = "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG";
+        String pubString = "AAAAAA-DAJ2RY-AAPEXJ-OKYGMI-CUI6CQ-5RAY42-XMVSLK-KKWLCE-44CIF3-FNU7ST-QCUJ4M-UFO64S";
         PublicationData publicationData = new PublicationData(pubString);
 
         // Do the verification and check the result

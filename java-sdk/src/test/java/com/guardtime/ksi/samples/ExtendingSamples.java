@@ -163,9 +163,9 @@ public class ExtendingSamples extends KsiSamples {
 
         KSISignature signature = reader.read(getFile("signme.txt.unextended-ksig"));
 
-        // Publication code for 15.05.2018
+        // Publication code for 15.03.2021
         Date publicationDate = new PublicationData(
-                "AAAAAA-C2LPXQ-AAKODP-LQN52W-QDAHEJ-WXYWTX-VDU3OS-4VKSJS-WV7TAA-ACYPI3-VYV5GZ-42DOFG")
+                "AAAAAA-DAJ2RY-AAPEXJ-OKYGMI-CUI6CQ-5RAY42-XMVSLK-KKWLCE-44CIF3-FNU7ST-QCUJ4M-UFO64S")
                 .getPublicationTime();
 
         PublicationRecord publicationRecord = publicationsHandler.getPublicationsFile().getPublicationRecord(publicationDate);
