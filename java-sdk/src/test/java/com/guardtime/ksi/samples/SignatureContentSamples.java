@@ -56,6 +56,8 @@ public class SignatureContentSamples extends KsiSamples {
 
         for (AggregationHashChain ahc : signature.getAggregationHashChains()) {
             System.out.println("printAggregationHashChain > link count > " + ahc.getChainLinks().size());
+            System.out.println("printAggregationHashChain > link identity > " + identityClientIdToString(ahc.getIdentity()));
+            System.out.println("printAggregationHashChain > output hash > " + ahc.getOutputHash());
         }
     }
 
